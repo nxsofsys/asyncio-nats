@@ -9,10 +9,10 @@ class Client:
         self.nc = nc
         self.loop = loop
 
-    async     def message_handler(self, msg):
+    async def message_handler(self, msg):
         print("[Received on '{}']: {}".format(msg.subject, msg.data.decode()))
 
-    async     def request_handler(self, msg):
+    async def request_handler(self, msg):
         print("[Request on '{} {}']: {}".format(msg.subject, msg.reply,
                                                 msg.data.decode()))
         await self.nc.publish(msg.reply, b"I can help!")

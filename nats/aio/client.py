@@ -176,7 +176,7 @@ class Client(object):
             'errors_received': 0,
         }
 
-    async     def connect(self,
+    async def connect(self,
                 servers=["nats://127.0.0.1:4222"],
                 io_loop=None,
                 loop=None,
@@ -260,7 +260,7 @@ class Client(object):
                 self._current_server.last_attempt = time.monotonic()
                 self._current_server.reconnects += 1
 
-    async     def close(self):
+    async def close(self):
         """
         Closes the socket to which we are connected and
         sets the client to be in the CLOSED state.
@@ -268,7 +268,7 @@ class Client(object):
         """
         await self._close(Client.CLOSED)
 
-    async     def _close(self, status, do_cbs=True):
+    async def _close(self, status, do_cbs=True):
         if self.is_closed:
             self._status = status
             return
@@ -302,7 +302,7 @@ class Client(object):
                 pass
 
         # Relinquish control to allow background tasks to wrap up.
-        await asyncio.sleep(0, loop=self._loop)
+        await asyncio.sleep(0)
 
         if self._current_server is not None:
             # In case there is any pending data at this point, flush before disconnecting.
@@ -329,7 +329,7 @@ class Client(object):
             if self._closed_cb is not None:
                 await self._closed_cb()
 
-    async     def drain(self, sid=None):
+    async def drain(self, sid=None):
         """
         Drain will put a connection into a drain state. All subscriptions will
         immediately be put into a drain state. Upon completion, the publishers
@@ -381,7 +381,7 @@ class Client(object):
         nc = self
 
         # Draining happens async under a task per sub which can be awaited.
-        async         def drain_subscription():
+        async def drain_subscription():
             nonlocal sub
             nonlocal sid
             nonlocal nc
@@ -397,7 +397,7 @@ class Client(object):
                 # Wait until no more messages are left,
                 # then cancel the subscription task.
                 while len(sub.pending_queue) > 0:
-                    await asyncio.sleep(0.1, loop=nc._loop)
+                    await asyncio.sleep(0.1)
 
                 # Subscription is done and won't be receiving further
                 # messages so can throw it away now.
@@ -408,7 +408,7 @@ class Client(object):
                 pass
         return self._loop.create_task(drain_subscription())
 
-    async     def publish(self, subject, payload):
+    async def publish(self, subject, payload):
         """
         Sends a PUB command to the server on the specified subject.
 
@@ -427,7 +427,7 @@ class Client(object):
             raise ErrMaxPayload
         await self._publish(subject, _EMPTY_, payload, payload_size)
 
-    async     def publish_request(self, subject, reply, payload):
+    async def publish_request(self, subject, reply, payload):
         """
         Publishes a message tagging it with a reply subscription
         which can be used by those receiving the message to respond.
@@ -447,7 +447,7 @@ class Client(object):
             raise ErrMaxPayload
         await self._publish(subject, reply.encode(), payload, payload_size)
 
-    async     def _publish(self, subject, reply, payload, payload_size):
+    async def _publish(self, subject, reply, payload, payload_size):
         """
         Sends PUB command to the NATS server.
         """
@@ -464,7 +464,7 @@ class Client(object):
         if self._flush_queue.empty():
             await self._flush_pending()
 
-    async     def subscribe(self, subject,
+    async def subscribe(self, subject,
                   queue="",
                   cb=None,
                   future=None,
@@ -520,7 +520,7 @@ class Client(object):
         await self._subscribe(sub, ssid)
         return ssid
 
-    async     def subscribe_async(self, subject, **kwargs):
+    async def subscribe_async(self, subject, **kwargs):
         """
         Sets the subcription to use a task per message to be processed.
 
@@ -531,7 +531,7 @@ class Client(object):
         sid = await self.subscribe(subject, **kwargs)
         return sid
 
-    async     def unsubscribe(self, ssid, max_msgs=0):
+    async def unsubscribe(self, ssid, max_msgs=0):
         """
         Takes a subscription sequence id and removes the subscription
         from the client, optionally after receiving more than max_msgs.
@@ -565,13 +565,13 @@ class Client(object):
         for task in sub.pending_queue:
             task.cancel()
 
-    async     def _subscribe(self, sub, ssid):
+    async def _subscribe(self, sub, ssid):
         sub_cmd = b''.join([SUB_OP, _SPC_, sub.subject.encode(
         ), _SPC_, sub.queue.encode(), _SPC_, ("%d" % ssid).encode(), _CRLF_])
         await self._send_command(sub_cmd)
         await self._flush_pending()
        
-    async     def request(self, subject, payload, timeout=0.5, expected=1, cb=None):
+    async def request(self, subject, payload, timeout=0.5, expected=1, cb=None):
         """
         Implements the request/response pattern via pub/sub
         using a single wildcard subscription that handles
@@ -642,7 +642,7 @@ class Client(object):
 
         return msg
 
-    async     def timed_request(self, subject, payload, timeout=0.5):
+    async def timed_request(self, subject, payload, timeout=0.5):
         """
         Implements the request/response pattern via pub/sub
         using an ephemeral subscription which will be published
@@ -672,7 +672,7 @@ class Client(object):
             future.cancel()
             raise ErrTimeout
 
-    async     def auto_unsubscribe(self, sid, limit=1):
+    async def auto_unsubscribe(self, sid, limit=1):
         """
         Sends an UNSUB command to the server.  Unsubscribe is one of the basic building
         blocks in order to be able to define request/response semantics via pub/sub
@@ -682,7 +682,7 @@ class Client(object):
             raise ErrConnectionDraining
         await self._unsubscribe(sid, limit)
 
-    async     def _unsubscribe(self, sid, limit=1):
+    async def _unsubscribe(self, sid, limit=1):
         b_limit = b''
         if limit > 0:
             b_limit = ("%d" % limit).encode()
@@ -691,7 +691,7 @@ class Client(object):
         await self._send_command(unsub_cmd)
         await self._flush_pending()
 
-    async     def flush(self, timeout=60):
+    async def flush(self, timeout=60):
         """
         Sends a ping to the server expecting a pong back ensuring
         what we have written so far has made it to the server and
@@ -777,7 +777,7 @@ class Client(object):
     def is_draining_pubs(self):
         return self._status == Client.DRAINING_PUBS
 
-    async     def _send_command(self, cmd, priority=False):
+    async def _send_command(self, cmd, priority=False):
         if priority:
             self._pending.insert(0, cmd)
         else:
@@ -786,7 +786,7 @@ class Client(object):
         if self._pending_data_size > DEFAULT_PENDING_SIZE:
             await self._flush_pending()
 
-    async     def _flush_pending(self):
+    async def _flush_pending(self):
         try:
             # kick the flusher!
             await self._flush_queue.put(None)
@@ -833,7 +833,7 @@ class Client(object):
         else:
             raise NatsError("nats: invalid connect url option")
 
-    async     def _select_next_server(self):
+    async def _select_next_server(self):
         """
         Looks up in the server pool for an available server
         and attempts to connect.
@@ -884,7 +884,7 @@ class Client(object):
                     await self._error_cb(e)
                 continue
 
-    async     def _process_err(self, err_msg):
+    async def _process_err(self, err_msg):
         """
         Processes the raw error message sent by the server
         and close connection with current server.
@@ -908,7 +908,7 @@ class Client(object):
         # For now we handle similar as other clients and close.
         self._loop.create_task(self._close(Client.CLOSED, do_cbs))
 
-    async     def _process_op_err(self, e):
+    async def _process_op_err(self, e):
         """
         Process errors which occured while reading or parsing
         the protocol. If allow_reconnect is enabled it will
@@ -932,7 +932,7 @@ class Client(object):
             self._err = e
             await self._close(Client.CLOSED, True)
 
-    async     def _attempt_reconnect(self):
+    async def _attempt_reconnect(self):
         if self._reading_task is not None and not self._reading_task.cancelled():
             self._reading_task.cancel()
 
@@ -1045,14 +1045,14 @@ class Client(object):
         connect_opts = json.dumps(options, sort_keys=True)
         return b''.join([CONNECT_OP + _SPC_ + connect_opts.encode() + _CRLF_])
 
-    async     def _process_ping(self):
+    async def _process_ping(self):
         """
         Process PING sent by server.
         """
         await self._send_command(PONG)
         await self._flush_pending()
 
-    async     def _process_pong(self):
+    async def _process_pong(self):
         """
         Process PONG sent by server.
         """
@@ -1062,7 +1062,7 @@ class Client(object):
             self._pongs_received += 1
             self._pings_outstanding -= 1
 
-    async     def _execute_sub(self, sub, payload_size, msg):
+    async def _execute_sub(self, sub, payload_size, msg):
         sub.pending_size -= payload_size
         try:
             if sub.coro:
@@ -1075,7 +1075,7 @@ class Client(object):
             else:
                 raise
 
-    async     def _process_msg(self, sid, subject, reply, data):
+    async def _process_msg(self, sid, subject, reply, data):
         """
         Process MSG sent by server.
         """
@@ -1163,7 +1163,7 @@ class Client(object):
                 for srv in connect_urls:
                     self._server_pool.append(srv)
 
-    async     def _process_connect_init(self):
+    async def _process_connect_init(self):
         """
         Process INFO received from the server and CONNECT to the server
         with authentication.  It is also responsible of setting up the
@@ -1249,14 +1249,14 @@ class Client(object):
         # Task for kicking the flusher queue
         self._flusher_task = self._loop.create_task(self._flusher())
 
-    async     def _send_ping(self, future=None):
+    async def _send_ping(self, future=None):
         if future is None:
             future = asyncio.Future(loop=self._loop)
         self._pongs.append(future)
         self._io_writer.write(PING_PROTO)
         await self._flush_pending()
 
-    async     def _flusher(self):
+    async def _flusher(self):
         """
         Coroutine which continuously tries to consume pending commands
         and then flushes them to the socket.
@@ -1281,7 +1281,7 @@ class Client(object):
             except asyncio.CancelledError:
                 break
 
-    async     def _ping_interval(self):
+    async def _ping_interval(self):
         while True:
             await asyncio.sleep(self.options["ping_interval"],
                                      loop=self._loop)
@@ -1298,7 +1298,7 @@ class Client(object):
             # except asyncio.InvalidStateError:
             #     pass
 
-    async     def _read_loop(self):
+    async def _read_loop(self):
         """
         Coroutine which gathers bytes sent by the server
         and feeds them to the protocol parser.

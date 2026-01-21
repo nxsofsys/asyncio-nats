@@ -1020,7 +1020,7 @@ class ClientReconnectTest(MultiServerAuthTestCase):
         post_flush_pending_data = None
         done_once = False
 
-        async         def cb(msg):
+        async def cb(msg):
             pass
 
         await nc.subscribe("example.*", cb=cb)
@@ -1283,7 +1283,7 @@ class ClientTLSTest(TLSServerTestCase):
         nc = NATS()
         msgs = []
 
-        async         def subscription_handler(msg):
+        async def subscription_handler(msg):
             msgs.append(msg)
 
         payload = b'hello world'

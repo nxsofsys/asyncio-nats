@@ -50,7 +50,7 @@ async def main(loop):
     received = 0
     start = None
 
-    async     def handler(msg):
+    async def handler(msg):
         nonlocal received
         nonlocal start
         received += 1

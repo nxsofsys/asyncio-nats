@@ -7,7 +7,7 @@ from nats.aio.client import Client as NATS
 def run(loop):
     nc = NATS()
 
-    async     def closed_cb():
+    async def closed_cb():
         print("Connection to NATS is closed.")
         await asyncio.sleep(0.1, loop=loop)
         loop.stop()
@@ -21,7 +21,7 @@ def run(loop):
     await nc.connect(**options)
     print("Connected to NATS at {}...".format(nc.connected_url.netloc))
 
-    async     def subscribe_handler(msg):
+    async def subscribe_handler(msg):
         subject = msg.subject
         reply = msg.reply
         data = msg.data.decode()

@@ -15,7 +15,7 @@ def run(loop):
         keyfile='../tests/certs/client-key.pem')
     await nc.connect(io_loop=loop, tls=ssl_ctx)
 
-    async     def message_handler(msg):
+    async def message_handler(msg):
         subject = msg.subject
         reply = msg.reply
         data = msg.data.decode()
@@ -31,7 +31,7 @@ def run(loop):
     await nc.publish("foo", b'World')
     await nc.publish("foo", b'!!!!!')
 
-    async     def help_request(msg):
+    async def help_request(msg):
         subject = msg.subject
         reply = msg.reply
         data = msg.data.decode()

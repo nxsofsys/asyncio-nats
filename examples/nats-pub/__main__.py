@@ -43,10 +43,10 @@ def run(loop):
 
     nc = NATS()
 
-    async     def closed_cb():
+    async def closed_cb():
         print("Connection to NATS is closed.")
 
-    async     def reconnected_cb():
+    async def reconnected_cb():
         print("Connected to NATS at {}...".format(nc.connected_url.netloc))
 
     options = {

@@ -56,7 +56,7 @@ async def main(loop):
         show_usage_and_die()
 
     received = 0
-    async     def handler(msg):
+    async def handler(msg):
         nonlocal received
         received += 1
         if (received % HASH_MODULO) == 0:

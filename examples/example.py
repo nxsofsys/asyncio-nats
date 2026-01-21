@@ -11,7 +11,7 @@ def go(loop):
     except:
         pass
 
-    async     def message_handler(msg):
+    async def message_handler(msg):
         print("[Received on '{}']: {}".format(msg.subject, msg.data.decode()))
 
     try:
@@ -28,7 +28,7 @@ def go(loop):
     except ErrConnectionClosed:
         print("Connection closed prematurely")
 
-    async     def request_handler(msg):
+    async def request_handler(msg):
         print("[Request on '{} {}']: {}".format(msg.subject, msg.reply,
                                                 msg.data.decode()))
         await nc.publish(msg.reply, b'OK')

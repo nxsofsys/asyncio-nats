@@ -73,7 +73,7 @@ class Parser(object):
         self.needed = 0
         self.msg_arg = {}
 
-    async     def parse(self, data=b''):
+    async def parse(self, data=b''):
         """
         Parses the wire protocol from NATS for the client
         and dispatches the subscription callbacks.

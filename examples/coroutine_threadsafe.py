@@ -13,7 +13,7 @@ class Component(object):
     def response_handler(self, msg):
         print("--- Received: ", msg.subject, msg.data)
 
-    async     def another_handler(self, msg):
+    async def another_handler(self, msg):
         print("--- Another: ", msg.subject, msg.data, msg.reply)
         await self.nc.publish(msg.reply, b'I can help!')
 

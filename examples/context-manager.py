@@ -8,7 +8,7 @@ async def run(loop):
 
     is_done = asyncio.Future(loop=loop)
 
-    async     def closed_cb():
+    async def closed_cb():
         print("Connection to NATS is closed.")
         is_done.set_result(True)
 
@@ -21,7 +21,7 @@ async def run(loop):
     with (await nats.connect(**opts)) as nc:
         print("Connected to NATS at {}...".format(nc.connected_url.netloc))
 
-        async         def subscribe_handler(msg):
+        async def subscribe_handler(msg):
             subject = msg.subject
             reply = msg.reply
             data = msg.data.decode()

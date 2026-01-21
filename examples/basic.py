@@ -7,7 +7,7 @@ async def run(loop):
 
     await nc.connect("127.0.0.1:4222", loop=loop)
 
-    async     def message_handler(msg):
+    async def message_handler(msg):
         subject = msg.subject
         reply = msg.reply
         data = msg.data.decode()
@@ -23,7 +23,7 @@ async def run(loop):
     await nc.publish("foo", b'World')
     await nc.publish("foo", b'!!!!!')
 
-    async     def help_request(msg):
+    async def help_request(msg):
         subject = msg.subject
         reply = msg.reply
         data = msg.data.decode()

@@ -16,20 +16,20 @@ class MockNatsClient:
         self._server_info = {"max_payload": 1048576, "auth_required": False}
         self._server_pool = []
 
-    async     def _send_command(self, cmd):
+    async def _send_command(self, cmd):
         pass
 
-    async     def _process_pong(self):
+    async def _process_pong(self):
         pass
 
-    async     def _process_ping(self):
+    async def _process_ping(self):
         pass
 
-    async     def _process_msg(self, sid, subject, reply, payload):
+    async def _process_msg(self, sid, subject, reply, payload):
         sub = self._subs[sid]
         await sub.cb(sid, subject, reply, payload)
 
-    async     def _process_err(self, err=None):
+    async def _process_err(self, err=None):
         pass
 
     def _process_info(self, info):
@@ -70,7 +70,7 @@ class ProtocolParserTest(NatsTestCase):
         nc = MockNatsClient()
         expected = b'hello world!'
 
-        async         def payload_test(sid, subject, reply, payload):
+        async def payload_test(sid, subject, reply, payload):
             self.assertEqual(payload, expected)
 
         params = {
@@ -170,7 +170,7 @@ class ProtocolParserTest(NatsTestCase):
         nc = MockNatsClient()
 
         msgs = 0
-        async         def payload_test(sid, subject, reply, payload):
+        async def payload_test(sid, subject, reply, payload):
             nonlocal msgs
             msgs += 1
 
@@ -199,7 +199,7 @@ class ProtocolParserTest(NatsTestCase):
         nc = MockNatsClient()
 
         msgs = 0
-        async         def payload_test(sid, subject, reply, payload):
+        async def payload_test(sid, subject, reply, payload):
             nonlocal msgs
             msgs += 1
 
